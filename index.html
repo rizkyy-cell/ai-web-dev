@@ -1,245 +1,145 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chat Gemini</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant Glassmorphism</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, sans-serif;
-    }
+        .chat-container {
+            /* Efek Glassmorphism */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            width: 85%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            color: white;
+        }
 
-    body{
-      background:#0f172a;
-      color:white;
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:15px;
-    }
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.5rem;
+        }
 
-    .container{
-      width:100%;
-      max-width:700px;
-      background:#1e293b;
-      border-radius:20px;
-      overflow:hidden;
-      box-shadow:0 0 20px rgba(0,0,0,0.4);
-    }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
 
-    .header{
-      background:#2563eb;
-      padding:20px;
-      text-align:center;
-      font-size:24px;
-      font-weight:bold;
-    }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-    .chat-box{
-      height:500px;
-      overflow-y:auto;
-      padding:20px;
-      display:flex;
-      flex-direction:column;
-      gap:15px;
-      background:#0f172a;
-    }
+        button:hover {
+            background: #45a049;
+        }
 
-    .message{
-      padding:12px 15px;
-      border-radius:15px;
-      max-width:80%;
-      line-height:1.5;
-      word-wrap:break-word;
-    }
-
-    .user{
-      align-self:flex-end;
-      background:#2563eb;
-    }
-
-    .bot{
-      align-self:flex-start;
-      background:#374151;
-    }
-
-    .input-area{
-      display:flex;
-      gap:10px;
-      padding:15px;
-      background:#111827;
-    }
-
-    .input-area input{
-      flex:1;
-      padding:14px;
-      border:none;
-      outline:none;
-      border-radius:12px;
-      background:#374151;
-      color:white;
-    }
-
-    .input-area button{
-      padding:14px 20px;
-      border:none;
-      border-radius:12px;
-      background:#2563eb;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .input-area button:hover{
-      background:#1d4ed8;
-    }
-
-    .api-box{
-      padding:15px;
-      background:#111827;
-    }
-
-    .api-box input{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:12px;
-      background:#374151;
-      color:white;
-      outline:none;
-    }
-  </style>
+        #hasil-ai {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            min-height: 80px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <div class="chat-container">
+        <h2>Asisten AI</h2>
+        <input type="text" id="input-pesan" placeholder="Tanyakan sesuatu...">
+        <button onclick="kirimPesan()">Kirim Pesan</button>
+        <div id="hasil-ai">Jawaban akan muncul di sini...</div>
+    </div>
 
-  <div class="header">
-    AI Chat Gemini
-  </div>
-
-  <div class="api-box">
-    <input 
-      type="password" 
-      id="apiKey"
-      placeholder="AIzaSyDrUcac2_XSbJ9aabXVA3ya32eGMYn8JsA">
-  </div>
-
-  <div class="chat-box" id="chatBox"></div>
-
-  <div class="input-area">
-    <input 
-      type="text" 
-      id="userInput" 
-      placeholder="Tulis pesan...">
-
-    <button onclick="sendMessage()">
-      Kirim
-    </button>
-  </div>
-
-</div>
+    <!-- Panggil file JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
 
 <script>
+// Ganti tulisan TARUH_API_KEY_DI_SINI dengan API Key milikmu yang asli
+const API_KEY = "AIzaSyDrUcac2_XSbJ9aabXVA3ya32eGMYn8JsA"; 
 
-const chatBox = document.getElementById("chatBox");
-const userInput = document.getElementById("userInput");
+async function kirimPesan() {
+    const inputPesan = document.getElementById("input-pesan").value;
+    const divHasil = document.getElementById("hasil-ai");
 
-function addMessage(text, sender){
+    // Validasi sederhana: jangan kirim jika input kosong
+    if (inputPesan.trim() === "") {
+        divHasil.innerText = "Ketik pesan terlebih dahulu!";
+        return;
+    }
 
-  const div = document.createElement("div");
+    // Menampilkan teks loading saat menunggu balasan
+    divHasil.innerText = "Sedang berpikir...";
 
-  div.classList.add("message");
-  div.classList.add(sender);
+    // Link endpoint resmi dari Gemini API
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-  div.innerText = text;
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: inputPesan }]
+                }]
+            })
+        });
 
-  chatBox.appendChild(div);
+        const data = await response.json();
+        
+        // Mengambil teks balasan dari struktur data JSON yang dikirim Gemini
+        const jawabanAI = data.candidates[0].content.parts[0].text;
+        
+        // Menampilkan jawaban ke layar
+        divHasil.innerText = jawabanAI;
 
-  chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (error) {
+        console.error("Error:", error);
+        divHasil.innerText = "Maaf, terjadi kesalahan saat menghubungi AI. Periksa koneksi atau API Key kamu.";
+    }
 }
 
-async function sendMessage(){
-
-  const apiKey = document.getElementById("apiKey").value;
-
-  const message = userInput.value.trim();
-
-  if(!apiKey){
-    alert("Masukkan API Key dulu");
-    return;
-  }
-
-  if(!message){
-    return;
-  }
-
-  addMessage(message, "user");
-
-  userInput.value = "";
-
-  addMessage("Mengetik...", "bot");
-
-  try{
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify({
-          contents:[
-            {
-              parts:[
-                {
-                  text: message
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    document.querySelector(".bot:last-child").remove();
-
-    const aiText =
-      data.candidates[0].content.parts[0].text;
-
-    addMessage(aiText, "bot");
-
-  }catch(error){
-
-    document.querySelector(".bot:last-child").remove();
-
-    addMessage(
-      "Error: " + error.message,
-      "bot"
-    );
-  }
-}
-
-userInput.addEventListener("keypress", function(e){
-
-  if(e.key === "Enter"){
-    sendMessage();
-  }
-
-});
-
-</script>
-
+</script
 </body>
 </html>
