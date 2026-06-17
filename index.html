@@ -2,144 +2,336 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant Glassmorphism</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CS Chat iOS - Liquid Glass Final</title>
     <style>
+        :root {
+            /* LINK BACKGROUND GAMBAR DARI IMG.COM DI SINI */
+            --bg-img: url('https://i.ibb.co.com/MkDvZyG3/8e6be91a01ba06f18b9eddfb944b2b42.jpg'); 
+            
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --chat-user: rgba(0, 94, 84, 0.65);
+            --chat-ai: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --icon-color: #ffffff;
+            --drawer-bg: rgba(28, 28, 30, 0.7);
+        }
+
+        body.light-theme {
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+            --chat-user: rgba(220, 248, 198, 0.85);
+            --chat-ai: rgba(255, 255, 255, 0.55);
+            --text-main: #1c1c1e;
+            --text-muted: #666666;
+            --icon-color: #007aff;
+            --drawer-bg: rgba(242, 242, 247, 0.75);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Arial, sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        /* KUNCI BACKGROUND MATI */
+        .bg-fixed-layer {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: var(--bg-img);
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Berada di paling belakang */
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100vh; width: 100vw; 
+            overflow: hidden;
+            color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .chat-container {
-            /* Efek Glassmorphism */
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 25px;
-            width: 85%;
-            max-width: 400px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            color: white;
+        .app-container {
+            width: 100%; max-width: 430px; 
+            height: 100%;
+            position: relative;
+            display: flex; flex-direction: column; 
+            overflow: hidden;
         }
 
-        h2 {
-            margin-top: 0;
-            text-align: center;
-            font-size: 1.5rem;
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
+            border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+            transition: background 0.3s ease, border 0.3s ease;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            box-sizing: border-box;
-            outline: none;
+        /* HEADER DIPERKECIL & DIKUNCI DI ATAS */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 14px 8px 14px; 
+            z-index: 10;
+            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
         }
+        .header-left { display: flex; align-items: center; gap: 6px; }
+        .back-btn { display: flex; align-items: center; cursor: pointer; }
+        .profile-pic { width: 34px; height: 34px; border-radius: 50%; background: #ccc; overflow: hidden; }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+        .user-info h1 { font-size: 15px; font-weight: 600; line-height: 1.2; }
+        .user-info p { font-size: 11px; color: var(--text-muted); }
+
+        /* KAPSUL BULAT LIQUID GLASS UNTUK TOMBOL TITIK TIGA */
+        .menu-container {
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border-radius: 50%;
+        }
+        .menu-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+
+        .menu-dropdown {
+            position: absolute; top: 75px; right: 14px; width: 150px;
+            border-radius: 20px; padding: 6px; opacity: 0; visibility: hidden;
+            transform: scale(0.85) translateY(-10px); transform-origin: top right;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.2, 1); z-index: 100;
+        }
+        .menu-dropdown.active { opacity: 1; visibility: visible; transform: scale(1) translateY(0); }
+        .menu-dropdown button {
+            width: 100%; padding: 10px 12px; background: none; border: none;
+            text-align: left; color: var(--text-main); font-size: 14px; cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;
+        }
+        body.light-theme .menu-dropdown button { border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .menu-dropdown button:last-child { border-bottom: none; }
+        .menu-dropdown svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* AREA CHAT OTOMATIS BERGESER & MENYUSUT */
+        .chat-area { 
+            flex: 1; padding: 14px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 12px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .bubble { max-width: 75%; padding: 8px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; position: relative; color: var(--text-main); }
+        .bubble.ai { align-self: flex-start; background: var(--chat-ai); border-top-left-radius: 4px; }
+        .bubble.user { align-self: flex-end; background: var(--chat-user); border-top-right-radius: 4px; }
+        .time { font-size: 10px; color: var(--text-muted); float: right; margin: 8px 0 0 10px; }
+
+        /* FOOTER INPUT */
+        footer {
+            padding: 8px 12px 20px 12px; display: flex; align-items: center; gap: 12px; z-index: 10;
+        }
+        .add-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
+        .input-capsule { flex: 1; display: flex; align-items: center; border-radius: 22px; padding: 4px 6px 4px 14px; height: 38px; gap: 10px; }
+        .input-capsule input { flex: 1; background: none; border: none; color: var(--text-main); font-size: 15px; outline: none; height: 100%; }
+        .input-capsule input::placeholder { color: var(--text-muted); }
+        .camera-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 4px; }
         
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
+        /* TOMBOL KANAN (MIC / PESAWAT) */
+        .action-btn-wrapper { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .action-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        .hidden-btn { display: none !important; }
+        
+        .ios-icon { color: var(--icon-color); fill: currentColor; }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+        /* DRAWER BOTTOM SHEET */
+        .drawer-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.35); opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 20; }
+        .drawer-overlay.show { opacity: 1; visibility: visible; }
+        .bottom-drawer {
+            position: absolute; bottom: 0; left: 0; right: 0; background: var(--drawer-bg);
+            backdrop-filter: blur(35px) saturate(160%); -webkit-backdrop-filter: blur(35px) saturate(160%);
+            border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 14px 20px 34px 20px;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.2, 1); z-index: 21;
         }
+        .bottom-drawer.open { transform: translateY(0); }
+        .drawer-indicator { width: 36px; height: 5px; background: rgba(255,255,255,0.18); border-radius: 10px; margin: 0 auto 20px auto; }
+        body.light-theme .drawer-indicator { background: rgba(0,0,0,0.12); }
+        .drawer-list { display: flex; flex-direction: column; gap: 2px; border-radius: 16px; overflow: hidden; }
+        .drawer-row {
+            display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+            background: rgba(255,255,255,0.04); color: var(--text-main); font-size: 16px; cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;
+        }
+        body.light-theme .drawer-row { background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .drawer-row:last-child { border-bottom: none; }
+        .drawer-row svg { width: 22px; height: 22px; fill: var(--icon-color); }
 
-        button:hover {
-            background: #45a049;
+        .theme-ripple {
+            position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: invert(100%) blur(20px); -webkit-backdrop-filter: invert(100%) blur(20px);
+            transform: scale(0); opacity: 1; pointer-events: none; z-index: 9999;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.2, 1), opacity 0.75s ease-out;
         }
-
-        #hasil-ai {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            min-height: 80px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
+        .theme-ripple.expand { transform: scale(160); opacity: 0; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <h2>Asisten AI</h2>
-        <input type="text" id="input-pesan" placeholder="Tanyakan sesuatu...">
-        <button onclick="kirimPesan()">Kirim Pesan</button>
-        <div id="hasil-ai">Jawaban akan muncul di sini...</div>
+    <div class="bg-fixed-layer"></div>
+
+    <div class="app-container" id="app-container">
+        
+        <header class="liquid-glass">
+            <div class="header-left">
+                <div class="back-btn">
+                    <svg class="ios-icon" width="22" height="22" viewBox="0 0 24 24"><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/></svg>
+                </div>
+                <div class="profile-pic">
+                    <img src="https://ui-avatars.com/api/?name=AI&background=005E54&color=fff" alt="AI">
+                </div>
+                <div class="user-info">
+                    <h1>rezkyy v1 (You)</h1>
+                    <p>Message yourself</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="menu-container liquid-glass">
+                    <button class="menu-btn" id="menu-btn">
+                        <svg class="ios-icon" width="20" height="20" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    </button>
+                </div>
+                
+                <div class="menu-dropdown liquid-glass" id="menu-dropdown">
+                    <button id="theme-btn">
+                        <span>Ganti Tema</span>
+                        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                    </button>
+                    <button>
+                        <span>Setelan</span>
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="chat-area" id="chat-area">
+            <div class="bubble ai liquid-glass">
+                Kumpulan Tools, Mod Aplikasi, dan Etalase App Premium untuk Android & Ios.
+                <span class="time">11:26 AM</span>
+            </div>
+            <div class="bubble user liquid-glass">
+                https://dasboard-web-kyy.vercel.app/?yyyg
+                <span class="time">11:26 AM</span>
+            </div>
+        </main>
+
+        <footer id="app-footer">
+            <button class="add-btn" id="add-btn">
+                <svg class="ios-icon" width="28" height="28" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+            
+            <div class="input-capsule liquid-glass">
+                <input type="text" placeholder="Pesan" id="chat-input" autocomplete="off">
+                <button class="camera-btn">
+                    <svg class="ios-icon" width="22" height="22" viewBox="0 0 24 24"><path d="M12 12c1.65 0 3-1.35 3-3s-1.35-3-3-3-3 1.35-3 3 1.35 3 3 3zm0-5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm7-3h-3.17L14.2 2H9.8L8.17 4H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h3.88l1.63-2h2.98l1.64 2H19v12zm-7-9c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                </button>
+            </div>
+            
+            <div class="action-btn-wrapper">
+                <button class="action-btn" id="mic-btn">
+                    <svg class="ios-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.34 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                </button>
+                <button class="action-btn hidden-btn" id="send-btn">
+                    <svg class="ios-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </footer>
+
+        <div class="drawer-overlay" id="drawer-overlay"></div>
+        <div class="bottom-drawer" id="drawer">
+            <div class="drawer-indicator"></div>
+            <div class="drawer-list">
+                <div class="drawer-row">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    <span>Dokumen</span>
+                </div>
+                <div class="drawer-row">
+                    <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 5H5l3.5-3.5z"/></svg>
+                    <span>Galeri Foto & Video</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Panggil file JavaScript -->
-    <script src="script.js"></script>
-</body>
-</html>
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const menuDropdown = document.getElementById('menu-dropdown');
+        const addBtn = document.getElementById('add-btn');
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        const chatInput = document.getElementById('chat-input');
+        const chatArea = document.getElementById('chat-area');
+        const appContainer = document.getElementById('app-container');
+        const micBtn = document.getElementById('mic-btn');
+        const sendBtn = document.getElementById('send-btn');
 
-<script>
-// Ganti tulisan TARUH_API_KEY_DI_SINI dengan API Key milikmu yang asli
-const API_KEY = "AIzaSyDrUcac2_XSbJ9aabXVA3ya32eGMYn8JsA"; 
-
-async function kirimPesan() {
-    const inputPesan = document.getElementById("input-pesan").value;
-    const divHasil = document.getElementById("hasil-ai");
-
-    // Validasi sederhana: jangan kirim jika input kosong
-    if (inputPesan.trim() === "") {
-        divHasil.innerText = "Ketik pesan terlebih dahulu!";
-        return;
-    }
-
-    // Menampilkan teks loading saat menunggu balasan
-    divHasil.innerText = "Sedang berpikir...";
-
-    // Link endpoint resmi dari Gemini API
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: inputPesan }]
-                }]
-            })
+        // Dropdown Kontrol
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.classList.toggle('active');
         });
 
-        const data = await response.json();
-        
-        // Mengambil teks balasan dari struktur data JSON yang dikirim Gemini
-        const jawabanAI = data.candidates[0].content.parts[0].text;
-        
-        // Menampilkan jawaban ke layar
-        divHasil.innerText = jawabanAI;
+        document.addEventListener('click', (e) => {
+            if (!menuDropdown.contains(e.target) && e.target !== menuBtn) {
+                menuDropdown.classList.remove('active');
+            }
+        });
 
-    } catch (error) {
-        console.error("Error:", error);
-        divHasil.innerText = "Maaf, terjadi kesalahan saat menghubungi AI. Periksa koneksi atau API Key kamu.";
-    }
-}
+        // Drawer Kontrol (+)
+        function toggleDrawer() {
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+        addBtn.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
 
-</script
+        // Fungsi Scroll Otomatis Stabil
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // LOGIKA DYNAMIC VIEWPORT & AUTO SCROLL CHAT (Penyusutan Sempurna saat Keyboard Naik)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                const vpHeight = window.visualViewport.height;
+                appContainer.style.height = `${vpHeight}px`;
+                setTimeout(scrollToBottom, 60);
+            });
+        }
+
+        // TOGGLE ICON MIC / PESAWAT SAAT INPUT KETIK
+        chatInput.addEventListener('input', () => {
+            if (chatInput.value.trim() !== "") {
+                micBtn.classList.add('hidden-btn');
+                sendBtn.classList.remove('hidden-btn');
+            } else {
+                micBtn.classList.remove('hidden-btn');
+                sendBtn.classList.add('hidden-btn');
+            }
+            scrollToBottom();
+        });
+
+        chatInput.addEventListener('focus', () => setTimeout(scrollToBottom, 220));
+        window.addEventListener('load', scrollToBottom);
+
+        // Ripple Effect Ganti Tema
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.addEventListener('click', function(e) {
+            menuDropdown.classList.remove('active');
+            const x = e.clientX; const y = e.clientY;
+            const ripple = document.createElement('div');
+            ripple.className = 'theme-ripple';
+            ripple.style.left = `${x}px`; ripple.style.top = `${y}px`;
+            document.body.appendChild(ripple);
+
+            setTimeout(() => { ripple.classList.add('expand'); }, 10);
+            setTimeout(() => { document.body.classList.toggle('light-theme'); }, 320);
+            setTimeout(() => { ripple.remove(); }, 1000);
+        });
+    </script>
 </body>
 </html>
