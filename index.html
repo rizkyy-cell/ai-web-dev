@@ -6,7 +6,6 @@
     <title>CS Chat iOS - Liquid Glass Final</title>
     <style>
         :root {
-            /* LINK BACKGROUND GAMBAR DARI IMG.COM DI SINI */
             --bg-img: url('https://i.ibb.co.com/MkDvZyG3/8e6be91a01ba06f18b9eddfb944b2b42.jpg'); 
             
             --glass-bg: rgba(255, 255, 255, 0.12);
@@ -39,18 +38,19 @@
             -webkit-tap-highlight-color: transparent; 
         }
 
-        /* KUNCI BACKGROUND MATI */
         .bg-fixed-layer {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: var(--bg-img);
             background-size: cover;
             background-position: center;
-            z-index: -1; /* Berada di paling belakang */
+            z-index: -1;
         }
 
         body {
-            height: 100vh; width: 100vw; 
+            height: 100vh;
+            height: 100dvh; /* Mengikuti dynamic viewport mobile asli */
+            width: 100vw; 
             overflow: hidden;
             color: var(--text-main);
             display: flex; justify-content: center; align-items: center;
@@ -62,6 +62,8 @@
             position: relative;
             display: flex; flex-direction: column; 
             overflow: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .liquid-glass {
@@ -71,7 +73,6 @@
             transition: background 0.3s ease, border 0.3s ease;
         }
 
-        /* HEADER DIPERKECIL & DIKUNCI DI ATAS */
         header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 30px 14px 8px 14px; 
@@ -85,7 +86,6 @@
         .user-info h1 { font-size: 15px; font-weight: 600; line-height: 1.2; }
         .user-info p { font-size: 11px; color: var(--text-muted); }
 
-        /* KAPSUL BULAT LIQUID GLASS UNTUK TOMBOL TITIK TIGA */
         .menu-container {
             display: flex; align-items: center; justify-content: center;
             width: 34px; height: 34px; border-radius: 50%;
@@ -108,32 +108,33 @@
         .menu-dropdown button:last-child { border-bottom: none; }
         .menu-dropdown svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* AREA CHAT OTOMATIS BERGESER & MENYUSUT */
         .chat-area { 
             flex: 1; padding: 14px; overflow-y: auto; 
             display: flex; flex-direction: column; gap: 12px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
+        .chat-area::-webkit-scrollbar { display: none; }
+
         .bubble { max-width: 75%; padding: 8px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; position: relative; color: var(--text-main); }
         .bubble.ai { align-self: flex-start; background: var(--chat-ai); border-top-left-radius: 4px; }
         .bubble.user { align-self: flex-end; background: var(--chat-user); border-top-right-radius: 4px; }
         .time { font-size: 10px; color: var(--text-muted); float: right; margin: 8px 0 0 10px; }
 
-        /* FOOTER INPUT */
+        /* FOOTER INPUT YANG SUDAH DIBERSIHKAN */
         footer {
             padding: 8px 12px 20px 12px; display: flex; align-items: center; gap: 12px; z-index: 10;
         }
         .add-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
-        .input-capsule { flex: 1; display: flex; align-items: center; border-radius: 22px; padding: 4px 6px 4px 14px; height: 38px; gap: 10px; }
+        .input-capsule { flex: 1; display: flex; align-items: center; border-radius: 22px; padding: 4px 14px; height: 40px; }
         .input-capsule input { flex: 1; background: none; border: none; color: var(--text-main); font-size: 15px; outline: none; height: 100%; }
         .input-capsule input::placeholder { color: var(--text-muted); }
-        .camera-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 4px; }
         
-        /* TOMBOL KANAN (MIC / PESAWAT) */
-        .action-btn-wrapper { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
-        .action-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-        .hidden-btn { display: none !important; }
+        .action-btn-wrapper { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .action-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; transition: opacity 0.2s; }
+        .action-btn:disabled { opacity: 0.4; cursor: default; }
         
         .ios-icon { color: var(--icon-color); fill: currentColor; }
 
@@ -166,28 +167,6 @@
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.2, 1), opacity 0.75s ease-out;
         }
         .theme-ripple.expand { transform: scale(160); opacity: 0; }
-
-      /* Update pada .app-container */
-.app-container {
-    width: 100%; max-width: 430px; 
-    height: 100%;
-    position: relative;
-    display: flex; flex-direction: column; 
-    overflow: hidden;
-    /* Tambahan Safe Area iOS/Android modern */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Sembunyikan scrollbar di area chat agar terlihat seperti aplikasi native */
-.chat-area::-webkit-scrollbar {
-    display: none;
-}
-.chat-area {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
     </style>
 </head>
 <body>
@@ -223,7 +202,7 @@
                     </button>
                     <button>
                         <span>Setelan</span>
-                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18 1.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
                     </button>
                 </div>
             </div>
@@ -247,17 +226,11 @@
             
             <div class="input-capsule liquid-glass">
                 <input type="text" placeholder="Pesan" id="chat-input" autocomplete="off">
-                <button class="camera-btn">
-                    <svg class="ios-icon" width="22" height="22" viewBox="0 0 24 24"><path d="M12 12c1.65 0 3-1.35 3-3s-1.35-3-3-3-3 1.35-3 3 1.35 3 3 3zm0-5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm7-3h-3.17L14.2 2H9.8L8.17 4H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h3.88l1.63-2h2.98l1.64 2H19v12zm-7-9c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
-                </button>
             </div>
             
             <div class="action-btn-wrapper">
-                <button class="action-btn" id="mic-btn">
-                    <svg class="ios-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.34 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-                </button>
-                <button class="action-btn hidden-btn" id="send-btn">
-                    <svg class="ios-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                <button class="action-btn" id="send-btn" disabled>
+                    <svg class="ios-icon" width="26" height="26" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                 </button>
             </div>
         </footer>
@@ -270,17 +243,13 @@
                     <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                     <span>Dokumen</span>
                 </div>
-                <div class="drawer-row">
-                    <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 5H5l3.5-3.5z"/></svg>
-                    <span>Galeri Foto & Video</span>
-                </div>
             </div>
         </div>
 
     </div>
 
     <script>
-                const menuBtn = document.getElementById('menu-btn');
+        const menuBtn = document.getElementById('menu-btn');
         const menuDropdown = document.getElementById('menu-dropdown');
         const addBtn = document.getElementById('add-btn');
         const drawer = document.getElementById('drawer');
@@ -288,18 +257,17 @@
         const chatInput = document.getElementById('chat-input');
         const chatArea = document.getElementById('chat-area');
         const appContainer = document.getElementById('app-container');
-        const micBtn = document.getElementById('mic-btn');
         const sendBtn = document.getElementById('send-btn');
         const themeBtn = document.getElementById('theme-btn');
         const backBtn = document.querySelector('.back-btn');
         const drawerRows = document.querySelectorAll('.drawer-row');
 
-        // --- 1. PENYIMPANAN TEMA (LOCALSTORAGE) ---
+        // --- 1. LOCALSTORAGE TEMA ---
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-theme');
         }
 
-        // Dropdown Kontrol
+        // Menu Dropdown Kontrol
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.toggle('active');
@@ -311,7 +279,7 @@
             }
         });
 
-        // Ripple Effect & Ganti Tema
+        // Ripple Effect Ganti Tema
         themeBtn.addEventListener('click', function(e) {
             menuDropdown.classList.remove('active');
             const x = e.clientX; const y = e.clientY;
@@ -332,15 +300,11 @@
             setTimeout(() => { ripple.remove(); }, 1000);
         });
 
-        // --- 2. KONTROL UI LAINNYA ---
-        
-        // Tombol Back
+        // --- 2. KONTROL INTERFAK & DRAWER ---
         backBtn.addEventListener('click', () => {
-            // Bisa diganti dengan window.history.back() jika sudah ada riwayat halaman
-            console.log("Kembali ke halaman sebelumnya");
+            console.log("Tombol kembali diklik");
         });
 
-        // Drawer Kontrol (+)
         function toggleDrawer() {
             drawer.classList.toggle('open');
             overlay.classList.toggle('show');
@@ -348,29 +312,25 @@
         addBtn.addEventListener('click', toggleDrawer);
         overlay.addEventListener('click', toggleDrawer);
 
-        // Tutup drawer jika item dipilih (Dokumen / Galeri)
         drawerRows.forEach(row => {
             row.addEventListener('click', () => {
                 toggleDrawer();
-                // Tambahkan logika buka file manager di sini nantinya
             });
         });
 
-        // Fungsi Scroll Otomatis Stabil
         function scrollToBottom() {
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        // Dynamic Viewport untuk Keyboard Mobile
+        // RESOLUSI BUG LAYAR HITAM: Memanfaatkan 100dvh CSS & Penyesuaian Event Viewport murni Android
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
-                const vpHeight = window.visualViewport.height;
-                appContainer.style.height = `${vpHeight}px`;
-                setTimeout(scrollToBottom, 60);
+                // Biarkan CSS dvh mengontrol tinggi tubuh, JS hanya memastikan scroll tetap menempel ke bawah
+                setTimeout(scrollToBottom, 80);
             });
         }
 
-        // --- 3. FUNGSI KIRIM PESAN ---
+        // --- 3. LOGIKA KIRIM PESAN ---
         function getFormattedTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -391,37 +351,30 @@
             bubble.innerHTML = `${text} <span class="time">${getFormattedTime()}</span>`;
 
             chatArea.appendChild(bubble);
-            
             chatInput.value = '';
-            micBtn.classList.remove('hidden-btn');
-            sendBtn.classList.add('hidden-btn');
+            sendBtn.disabled = true; // Kunci kembali tombol setelah kirim
             
-            scrollToBottom();
+            setTimeout(scrollToBottom, 50);
         }
 
-        // Toggle Icon Mic / Send saat mengetik
+        // Deteksi input teks untuk mengaktifkan tombol send
         chatInput.addEventListener('input', () => {
             if (chatInput.value.trim() !== "") {
-                micBtn.classList.add('hidden-btn');
-                sendBtn.classList.remove('hidden-btn');
+                sendBtn.disabled = false;
             } else {
-                micBtn.classList.remove('hidden-btn');
-                sendBtn.classList.add('hidden-btn');
+                sendBtn.disabled = true;
             }
-            scrollToBottom();
         });
 
-        chatInput.addEventListener('focus', () => setTimeout(scrollToBottom, 220));
+        chatInput.addEventListener('focus', () => setTimeout(scrollToBottom, 250));
         window.addEventListener('load', scrollToBottom);
 
-        // Eksekusi Kirim Pesan
         sendBtn.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-
     </script>
 </body>
 </html>
