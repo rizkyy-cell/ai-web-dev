@@ -166,6 +166,28 @@
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.2, 1), opacity 0.75s ease-out;
         }
         .theme-ripple.expand { transform: scale(160); opacity: 0; }
+
+      /* Update pada .app-container */
+.app-container {
+    width: 100%; max-width: 430px; 
+    height: 100%;
+    position: relative;
+    display: flex; flex-direction: column; 
+    overflow: hidden;
+    /* Tambahan Safe Area iOS/Android modern */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Sembunyikan scrollbar di area chat agar terlihat seperti aplikasi native */
+.chat-area::-webkit-scrollbar {
+    display: none;
+}
+.chat-area {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
     </style>
 </head>
 <body>
@@ -183,8 +205,8 @@
                     <img src="https://ui-avatars.com/api/?name=AI&background=005E54&color=fff" alt="AI">
                 </div>
                 <div class="user-info">
-                    <h1>rezkyy v1 (You)</h1>
-                    <p>Message yourself</p>
+                    <h1>KYY CS</h1>
+                    <p>Asisten Otomatis</p>
                 </div>
             </div>
             <div class="header-right">
@@ -258,7 +280,7 @@
     </div>
 
     <script>
-        const menuBtn = document.getElementById('menu-btn');
+                const menuBtn = document.getElementById('menu-btn');
         const menuDropdown = document.getElementById('menu-dropdown');
         const addBtn = document.getElementById('add-btn');
         const drawer = document.getElementById('drawer');
@@ -268,6 +290,14 @@
         const appContainer = document.getElementById('app-container');
         const micBtn = document.getElementById('mic-btn');
         const sendBtn = document.getElementById('send-btn');
+        const themeBtn = document.getElementById('theme-btn');
+        const backBtn = document.querySelector('.back-btn');
+        const drawerRows = document.querySelectorAll('.drawer-row');
+
+        // --- 1. PENYIMPANAN TEMA (LOCALSTORAGE) ---
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+        }
 
         // Dropdown Kontrol
         menuBtn.addEventListener('click', (e) => {
@@ -281,6 +311,35 @@
             }
         });
 
+        // Ripple Effect & Ganti Tema
+        themeBtn.addEventListener('click', function(e) {
+            menuDropdown.classList.remove('active');
+            const x = e.clientX; const y = e.clientY;
+            const ripple = document.createElement('div');
+            ripple.className = 'theme-ripple';
+            ripple.style.left = `${x}px`; ripple.style.top = `${y}px`;
+            document.body.appendChild(ripple);
+
+            setTimeout(() => { ripple.classList.add('expand'); }, 10);
+            setTimeout(() => { 
+                document.body.classList.toggle('light-theme'); 
+                if (document.body.classList.contains('light-theme')) {
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    localStorage.setItem('theme', 'dark');
+                }
+            }, 320);
+            setTimeout(() => { ripple.remove(); }, 1000);
+        });
+
+        // --- 2. KONTROL UI LAINNYA ---
+        
+        // Tombol Back
+        backBtn.addEventListener('click', () => {
+            // Bisa diganti dengan window.history.back() jika sudah ada riwayat halaman
+            console.log("Kembali ke halaman sebelumnya");
+        });
+
         // Drawer Kontrol (+)
         function toggleDrawer() {
             drawer.classList.toggle('open');
@@ -289,12 +348,20 @@
         addBtn.addEventListener('click', toggleDrawer);
         overlay.addEventListener('click', toggleDrawer);
 
+        // Tutup drawer jika item dipilih (Dokumen / Galeri)
+        drawerRows.forEach(row => {
+            row.addEventListener('click', () => {
+                toggleDrawer();
+                // Tambahkan logika buka file manager di sini nantinya
+            });
+        });
+
         // Fungsi Scroll Otomatis Stabil
         function scrollToBottom() {
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        // LOGIKA DYNAMIC VIEWPORT & AUTO SCROLL CHAT (Penyusutan Sempurna saat Keyboard Naik)
+        // Dynamic Viewport untuk Keyboard Mobile
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
                 const vpHeight = window.visualViewport.height;
@@ -303,7 +370,36 @@
             });
         }
 
-        // TOGGLE ICON MIC / PESAWAT SAAT INPUT KETIK
+        // --- 3. FUNGSI KIRIM PESAN ---
+        function getFormattedTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text === '') return;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble user liquid-glass';
+            bubble.innerHTML = `${text} <span class="time">${getFormattedTime()}</span>`;
+
+            chatArea.appendChild(bubble);
+            
+            chatInput.value = '';
+            micBtn.classList.remove('hidden-btn');
+            sendBtn.classList.add('hidden-btn');
+            
+            scrollToBottom();
+        }
+
+        // Toggle Icon Mic / Send saat mengetik
         chatInput.addEventListener('input', () => {
             if (chatInput.value.trim() !== "") {
                 micBtn.classList.add('hidden-btn');
@@ -318,20 +414,14 @@
         chatInput.addEventListener('focus', () => setTimeout(scrollToBottom, 220));
         window.addEventListener('load', scrollToBottom);
 
-        // Ripple Effect Ganti Tema
-        const themeBtn = document.getElementById('theme-btn');
-        themeBtn.addEventListener('click', function(e) {
-            menuDropdown.classList.remove('active');
-            const x = e.clientX; const y = e.clientY;
-            const ripple = document.createElement('div');
-            ripple.className = 'theme-ripple';
-            ripple.style.left = `${x}px`; ripple.style.top = `${y}px`;
-            document.body.appendChild(ripple);
-
-            setTimeout(() => { ripple.classList.add('expand'); }, 10);
-            setTimeout(() => { document.body.classList.toggle('light-theme'); }, 320);
-            setTimeout(() => { ripple.remove(); }, 1000);
+        // Eksekusi Kirim Pesan
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
+
     </script>
 </body>
 </html>
